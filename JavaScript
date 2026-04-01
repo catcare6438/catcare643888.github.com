@@ -1,0 +1,101 @@
+const CSV_URL = '你的Google試算表CSV連結';
+let externalSchedule = {};
+let localSchedule = JSON.parse(localStorage.getItem('calendar_cache')) || {};
+
+// 6. 顯示資料統一來源
+function getDayData(date) {
+    return localSchedule[date] || [];
+}
+
+// 7. 自動同步與 CSV 解析
+async function fetchSchedule() {
+    const btn = document.getElementById('sync-btn');
+    const statusEl = document.getElementById('sync-status');
+    btn.disabled = true;
+    statusEl.innerText = "同步中...";
+
+    try {
+        const response = await fetch(`${CSV_URL}&t=${new Date().getTime()}`);
+        const data = await response.text();
+        const rows = data.split('\n').slice(1);
+        
+        const parsedData = {};
+        rows.forEach(row => {
+            const [date, name, start, end, note] = row.split(',').map(s => s?.trim());
+            if (date && date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                if (!parsedData[date]) parsedData[date] = [];
+                parsedData[date].push({ name, start, end, note });
+            }
+        });
+
+        localSchedule = parsedData;
+        localStorage.setItem('calendar_cache', JSON.stringify(parsedData));
+        
+        statusEl.innerText = "同步成功";
+        statusEl.className = "status-badge status-success";
+        document.getElementById('last-sync-time').innerText = new Date().toLocaleTimeString();
+        
+        renderTodayInfo(); // 更新 Today 區塊
+        renderCalendar();  // 重新渲染日曆圖示
+    } catch (e) {
+        statusEl.innerText = "同步失敗";
+        statusEl.className = "status-badge status-fail";
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+// 1. Today 區塊：看到自己與他人的上班時間
+function renderTodayInfo() {
+    const today = new Date().toISOString().split('T')[0];
+    const dayData = getDayData(today);
+    
+    // 我的班表 (假設名字是 "你" 或 "球球")
+    const myShift = dayData.find(s => s.name === "你" || s.name === "球球");
+    document.getElementById('my-shift-time').innerText = myShift ? `${myShift.start} - ${myShift.end}` : "今日休假 🎉";
+
+    // 其他人上班時間
+    const others = dayData.filter(s => s.name !== "你" && s.name !== "球球");
+    const othersList = document.getElementById('others-list');
+    othersList.innerHTML = others.length 
+        ? others.map(s => `<li><strong>${s.name}</strong>: ${s.start}-${s.end}</li>`).join('')
+        : "<li>暫無其他人員</li>";
+
+    document.getElementById('total-people').innerText = dayData.length;
+    document.getElementById('display-today-date').innerText = today;
+}
+
+// 5. 日曆圖示升級邏輯
+function decorateDay(dateStr, dayElement) {
+    const dayData = getDayData(dateStr);
+    const hasMyShift = dayData.some(s => s.name === "你" || s.name === "球球");
+    const hasAnySchedule = dayData.length > 0;
+
+    // 清除舊圖示
+    const oldIcons = dayElement.querySelector('.icon-wrap');
+    if(oldIcons) oldIcons.remove();
+
+    const iconWrap = document.createElement('div');
+    iconWrap.className = 'icon-wrap';
+
+    /** 核心規則：
+     * 1. 我有班：🐱
+     * 2. 有行程：🔸
+     * 3. 沒班且沒行程：🎉
+     */
+    let icons = "";
+    if (hasMyShift) icons += "🐱";
+    if (hasAnySchedule) icons += "🔸";
+    if (!hasAnySchedule) icons += "🎉";
+
+    iconWrap.innerText = icons;
+    dayElement.appendChild(iconWrap);
+
+    // 4. 今日樣式
+    const today = new Date().toISOString().split('T')[0];
+    if (dateStr === today) dayElement.classList.add('today-mark');
+}
+
+// 綁定同步鍵
+document.getElementById('sync-btn').onclick = fetchSchedule;
+window.onload = fetchSchedule;
