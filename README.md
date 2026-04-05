@@ -315,3 +315,228 @@ input:focus, textarea:focus, select:focus {
 }
 textarea { resize: vertical; line-height: 1.7; }
 select { cursor: poin
+/* 接續你原本中斷的 select 樣式 */
+select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238B7BA8' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+}
+
+/* 數據卡片樣式 */
+.stat-box {
+    background: white;
+    padding: 16px;
+    border-radius: 18px;
+    border: 2px solid var(--border);
+    text-align: center;
+    transition: transform 0.2s;
+}
+.stat-box:hover { transform: translateY(-5px); }
+.stat-val { font-size: 22px; font-weight: 900; color: var(--pink2); }
+.stat-label { font-size: 11px; color: var(--text3); font-weight: 700; margin-top: 4px; }
+
+/* 貼文預覽區 */
+.preview-container {
+    background: var(--blue-bg);
+    border-radius: 20px;
+    border: 2px dashed var(--blue2);
+    padding: 20px;
+    min-height: 200px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text);
+    white-space: pre-wrap;
+}
+
+/* 自定義捲軸 */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--pink); }
+
+/* 響應式微調 */
+@media (max-width: 850px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="bubbles" id="bubble-container"></div>
+
+<header>
+    <div class="logo">
+        <div class="logo-blob">🐾</div>
+        <div>
+            <div class="logo-name">貓窩 NEKO HUB</div>
+            <div class="logo-en">COMMUNITY MANAGER</div>
+        </div>
+    </div>
+    <div class="header-pills">
+        <button class="pill pill-pink">喵喵模式 ON</button>
+        <button class="pill pill-blue">管理員：小花</button>
+    </div>
+</header>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-cat-deco">
+            <span class="cat-svg">🐱</span>
+            <p>今日貓氣值：100%</p>
+        </div>
+        
+        <div class="nav-section-title">主要選單</div>
+        <div class="nav-item active" onclick="showPage('dashboard', this)">
+            <span class="nav-emoji">🏠</span> 總覽面板
+        </div>
+        <div class="nav-item" onclick="showPage('composer', this)">
+            <span class="nav-emoji">✍️</span> 貼文靈感
+            <span class="nav-badge">NEW</span>
+        </div>
+        <div class="nav-item">
+            <span class="nav-emoji">📈</span> 數據分析
+        </div>
+        
+        <div class="nav-section-title" style="margin-top:20px;">工具箱</div>
+        <div class="nav-item">
+            <span class="nav-emoji">🖼️</span> 圖片生成
+        </div>
+        <div class="nav-item">
+            <span class="nav-emoji">⚙️</span> 系統設定
+        </div>
+    </aside>
+
+    <main class="content">
+        <section id="dashboard" class="page active">
+            <div class="page-hero">
+                <div class="page-hero-icon">🌤️</div>
+                <div>
+                    <h2 class="page-hero-title">早安，社群小編！</h2>
+                    <p class="page-hero-desc">今天又是充滿肉球香氣的一天。目前有 3 則預約貼文待發佈，粉絲互動率比昨日增長了 12% 喔！</p>
+                </div>
+            </div>
+
+            <div class="g4">
+                <div class="stat-box"><div class="stat-val">1,284</div><div class="stat-label">追蹤人數</div></div>
+                <div class="stat-box"><div class="stat-val">85%</div><div class="stat-label">平均互動</div></div>
+                <div class="stat-box"><div class="stat-val">12</div><div class="stat-label">本月貼文</div></div>
+                <div class="stat-box"><div class="stat-val">5</div><div class="stat-label">待辦任務</div></div>
+            </div>
+        </section>
+
+        <section id="composer" class="page">
+            <div class="page-hero">
+                <div class="page-hero-icon">✨</div>
+                <div>
+                    <h2 class="page-hero-title">文案靈感發射器</h2>
+                    <p class="page-hero-desc">輸入關鍵字，讓貓窩 AI 幫你寫出最吸睛的社群內容。</p>
+                </div>
+            </div>
+
+            <div class="g2">
+                <div class="card">
+                    <div class="card-head">
+                        <div class="card-icon ci-pink">📝</div>
+                        <div>
+                            <div class="card-title">編輯內容</div>
+                            <div class="card-subtitle">Editor</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><span class="label-icon">🏷️</span>主題標籤</label>
+                        <input type="text" id="topic-input" placeholder="例如：肉泥特價、主子日常...">
+                    </div>
+                    <div class="form-group">
+                        <label><span class="label-icon">🎭</span>語氣選擇</label>
+                        <select id="tone-select">
+                            <option value="cute">軟萌喵喵語 (ΦωΦ)</option>
+                            <option value="cool">傲嬌主子風 (￣^￣)</option>
+                            <option value="pro">專業貓奴報告</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-pink" style="width: 100%; justify-content: center;" onclick="generateText()">
+                        生成文案 ✨
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-head">
+                        <div class="card-icon ci-blue">👁️</div>
+                        <div>
+                            <div class="card-title">內容預覽</div>
+                            <div class="card-subtitle">Preview</div>
+                        </div>
+                    </div>
+                    <div class="preview-container" id="preview-box">
+                        文案會在這裡出現喵...
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+// 1. 生成動態背景泡泡
+function createBubbles() {
+    const container = document.getElementById('bubble-container');
+    const colors = ['#FFB5C8', '#A8D8EA', '#B5EAD7', '#FFEAA7'];
+    
+    for (let i = 0; i < 15; i++) {
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        
+        const size = Math.random() * 60 + 20 + 'px';
+        bubble.style.width = size;
+        bubble.style.height = size;
+        bubble.style.left = Math.random() * 100 + 'vw';
+        bubble.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        bubble.style.animationDuration = Math.random() * 10 + 5 + 's';
+        bubble.style.animationDelay = Math.random() * 5 + 's';
+        
+        container.appendChild(bubble);
+    }
+}
+
+// 2. 頁面切換邏輯
+function showPage(pageId, element) {
+    // 隱藏所有頁面
+    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    // 顯示目標頁面
+    document.getElementById(pageId).classList.add('active');
+    
+    // 更新側邊欄樣式
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    element.classList.add('active');
+}
+
+// 3. 模擬文案生成
+function generateText() {
+    const topic = document.getElementById('topic-input').value || '好吃的罐罐';
+    const tone = document.getElementById('tone-select').value;
+    const preview = document.getElementById('preview-box');
+    
+    preview.innerText = "正在呼喚靈感貓神...🐾";
+    
+    setTimeout(() => {
+        let content = "";
+        if(tone === 'cute') {
+            content = `喵嗚～各位人類注意！\n今天的【${topic}】超級誘人喵～🐾\n快點過來看看，不然朕要生氣囉！(っ●ω●)っ`;
+        } else if(tone === 'cool') {
+            content = `哼，聽說你們在找【${topic}】？\n朕剛好心情好，就給你們這群奴才瞧瞧。\n還不快按讚分享？(✧≖‿ゝ≖)`;
+        } else {
+            content = `【社群公告：關於${topic}的深度解析】\n經過專業肉球鑑定，本次內容互動率預計提升 200%。\n建議發佈時間：奴才餵飯前一小時。`;
+        }
+        preview.innerText = content;
+    }, 800);
+}
+
+// 初始化
+window.onload = createBubbles;
+</script>
+
+</body>
+</html>
