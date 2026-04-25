@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>兒童自律公約</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --pink:#E84D8A;
+  --pink2:#F472B6;
+  --pink-light:#FFB3D4;
+  --purple:#9B5DE5;
+  --purple2:#C084FC;
+  --purple-light:#E9D5FF;
+  --bg:#F8F0FF;
+  --text:#2D1B69;
+  --gray:#B0A0C0;
+  --orange:#F59E0B;
+  --green:#10B981;
+  --grad:linear-gradient(135deg,#FF6BAE 0%,#C084FC 100%);
+}
+body{font-family:'Noto Sans TC','Nunito',sans-serif;background:var(--bg);min-height:100vh;overflow-x:hidden;}
+.page{display:none;flex-direction:column;min-height:100vh;padding-bottom:80px;}
+.page.active{display:flex;}
+.nav{
+  position:fixed;bottom:0;left:0;right:0;background:#fff;
+  border-top:2px solid #F3E8FF;display:flex;z-index:200;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  box-shadow:0 -4px 20px rgba(155,93,229,.1);
+}
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:10px 0 8px;gap:3px;cursor:pointer;
+  border:none;background:none;transition:all .2s;
+}
+.nav-btn .n-icon{font-size:24px;transition:transform .2s;}
+.nav-btn .n-label{font-size:10px;font-weight:700;color:var(--gray);}
+.nav-btn.active .n-label{color:var(--purple);}
+.nav-btn.active .n-icon{transform:scale(1.15);}
+.section-pad{padding:0 14px;}
+.cards-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 14px 0;}
+.kid-card{
+  background:#fff;border-radius:22px;padding:18px 12px 16px;
+  text-align:center;position:relative;overflow:hidden;
+  box-shadow:0 4px 20px rgba(155,93,229,.12);cursor:pointer;
+  transition:transform .2s;
+}
+.kid-card:active{transform:scale(.97);}
+.kid-card.hong-card{border-top:4px solid var(--pink);}
+.kid-card.yu-card{border-top:4px solid var(--purple);}
+.kid-card .blob{
+  position:absolute;top:-20px;right:-20px;width:70px;height:70px;
+  border-radius:50%;opacity:.15;
+}
+.hong-card .blob{background:var(--pink);}
+.yu-card .blob{background:var(--purple);}
+.kid-avatar{
+  width:52px;height:52px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;margin:0 auto 8px;
+}
+.hong-card .kid-avatar{background:linear-gradient(135deg,#FFB3D4,#E84D8A);}
+.yu-card .kid-avatar{background:linear-gradient(135deg,#E9D5FF,#9B5DE5);}
+.kid-name{font-size:14px;font-weight:900;color:var(--text);margin-bottom:4px;}
+.kid-pts{font-size:46px;font-weight:900;line-height:1;font-family:'Nunito',sans-serif;}
+.hong-card .kid-pts{color:var(--pink);}
+.yu-card .kid-pts{color:var(--purple);}
+.pts-label{font-size:11px;color:var(--gray);margin-top:2px;}
+.week-wrap{
+  margin:12px 14px 0;background:#fff;border-radius:20px;
+  padding:14px 10px;box-shadow:0 4px 16px rgba(155,93,229,.1);
+}
+.week-row{display:flex;gap:4px;}
+.day-cell{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  cursor:pointer;padding:8px 2px;border-radius:14px;
+  transition:all .2s;border:2px solid transparent;
+}
+.day-cell:active{background:#F9F0FF;}
+.day-cell .d-circle{
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:800;color:var(--gray);
+  background:#F3E8FF;transition:all .2s;
+}
+.day-cell .d-label{font-size:10px;font-weight:700;color:var(--gray);}
+.day-cell.done .d-circle{background:var(--pink2);color:#fff;}
+.day-cell.today{border-color:var(--purple2);}
+.day-cell.today .d-label{color:var(--purple);font-weight:900;}
+.day-cell.today .d-circle{background:var(--purple);color:#fff;}
+.day-cell.done.today .d-circle{background:linear-gradient(135deg,var(--pink),var(--purple));}
+.kid-tabs{display:flex;gap:10px;padding:14px 14px 0;}
+.kid-tab{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:11px 8px;border-radius:50px;border:2px solid #E9D5FF;
+  font-size:14px;font-weight:800;color:var(--gray);
+  cursor:pointer;transition:all .25s;background:#fff;font-family:inherit;
+}
+.kid-tab.active.ht{background:linear-gradient(135deg,#FFB3D4,#E84D8A);border-color:transparent;color:#fff;box-shadow:0 4px 16px rgba(232,77,138,.35);}
+.kid-tab.active.yt{background:linear-gradient(135deg,#E9D5FF,#9B5DE5);border-color:transparent;color:#fff;box-shadow:0 4px 16px rgba(155,93,229,.35);}
+.task-header{margin:14px 14px 10px;display:flex;align-items:center;gap:10px;}
+.task-header-text{font-size:16px;font-weight:900;color:var(--text);}
+.task-count{background:var(--purple);color:#fff;font-size:12px;font-weight:800;border-radius:50px;padding:2px 10px;}
+.task-hint{
+  margin:0 14px 10px;background:linear-gradient(135deg,#FFF5F9,#F9F0FF);
+  border-radius:14px;padding:10px 14px;font-size:13px;font-weight:700;
+  color:var(--purple);border-left:4px solid var(--purple2);
+}
+.tasks-list{padding:0 14px;display:flex;flex-direction:column;gap:8px;}
+.task-row{
+  background:#fff;border-radius:16px;padding:14px 14px 14px 12px;
+  display:flex;align-items:center;gap:12px;
+  box-shadow:0 2px 12px rgba(155,93,229,.08);
+  border:2px solid transparent;cursor:pointer;transition:all .2s;
+}
+.task-row:active{transform:scale(.98);}
+.task-row.done{border-color:#D1FAE5;background:#F0FDF4;}
+.task-row.ht{border-left:4px solid var(--pink-light);}
+.task-row.ht.done{border-left:4px solid var(--green);}
+.task-row.yt{border-left:4px solid var(--purple-light);}
+.task-row.yt.done{border-left:4px solid var(--green);}
+.check-btn{
+  width:30px;height:30px;border-radius:50%;border:2.5px solid var(--pink-light);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:all .2s;font-size:16px;color:transparent;
+}
+.task-row.done .check-btn{background:var(--green);border-color:var(--green);color:#fff;}
+.task-name{flex:1;font-size:14px;font-weight:700;color:var(--text);}
+.task-row.done .task-name{color:#6B7280;text-decoration:line-through;}
+.pts-chip{
+  display:flex;align-items:center;gap:3px;background:#FFF3E0;
+  border-radius:50px;padding:4px 10px;font-size:13px;font-weight:800;color:var(--orange);
+}
+.task-row.done .pts-chip{background:#D1FAE5;color:var(--green);}
+.page-title-bar{
+  background:var(--grad);padding:20px 16px 14px;
+  font-size:18px;font-weight:900;color:#fff;
+  display:flex;align-items:center;gap:8px;
+}
+.kid-select-row{display:flex;gap:10px;padding:14px 14px 4px;}
+.ks-btn{
+  flex:1;padding:10px;border-radius:14px;border:2px solid #E9D5FF;
+  font-size:14px;font-weight:800;cursor:pointer;background:#fff;
+  transition:all .2s;color:var(--gray);font-family:inherit;
+}
+.ks-btn.active.h{background:linear-gradient(135deg,#FFB3D4,#E84D8A);color:#fff;border-color:transparent;}
+.ks-btn.active.y{background:linear-gradient(135deg,#E9D5FF,#9B5DE5);color:#fff;border-color:transparent;}
+.redeem-grid{padding:0 14px;display:flex;flex-direction:column;gap:10px;}
+.reward-card{
+  background:#fff;border-radius:18px;padding:14px 16px;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:0 2px 12px rgba(155,93,229,.1);border:2px solid #F3E8FF;
+}
+.r-icon{font-size:32px;flex-shrink:0;}
+.r-info{flex:1;}
+.r-name{font-size:15px;font-weight:800;color:var(--text);}
+.r-cost{font-size:12px;color:var(--gray);margin-top:2px;}
+.r-btn{
+  padding:9px 16px;border-radius:50px;border:none;
+  font-size:13px;font-weight:800;cursor:pointer;transition:all .2s;font-family:inherit;
+}
+.r-btn.can{background:var(--grad);color:#fff;box-shadow:0 4px 14px rgba(155,93,229,.3);}
+.r-btn.can:active{transform:scale(.95);}
+.r-btn.cant{background:#F3F4F6;color:#D1D5DB;cursor:not-allowed;}
+.sec-label{font-size:14px;font-weight:900;color:var(--text);padding:12px 14px 6px;display:flex;align-items:center;gap:6px;}
+.tickets-wrap{padding:0 14px;display:flex;flex-direction:column;gap:8px;}
+.ticket{
+  background:#fff;border-radius:16px;padding:12px 14px;
+  display:flex;align-items:center;gap:12px;
+  border:2px solid #F3E8FF;position:relative;overflow:hidden;
+}
+.ticket::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--grad);}
+.ticket.used::before{background:#D1D5DB;}
+.ticket.used{opacity:.6;}
+.t-icon{font-size:24px;}
+.t-info{flex:1;}
+.t-name{font-size:14px;font-weight:700;color:var(--text);}
+.t-meta{font-size:11px;color:var(--gray);margin-top:2px;}
+.t-tag{font-size:10px;font-weight:800;padding:4px 9px;border-radius:50px;white-space:nowrap;}
+.t-tag.pending{background:#FFF0FA;color:var(--pink);border:1.5px solid var(--pink-light);}
+.t-tag.confirmed{background:#F0F0F0;color:#aaa;border:1.5px solid #ddd;}
+.parent-locked{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:40px 30px;gap:14px;
+}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:280px;}
+.num-btn{
+  padding:16px;border-radius:16px;border:2px solid #E9D5FF;
+  font-size:22px;font-weight:800;cursor:pointer;background:#fff;
+  transition:all .15s;font-family:inherit;color:var(--text);
+}
+.num-btn:active{transform:scale(.93);background:var(--purple-light);}
+.num-btn.del{font-size:18px;color:var(--pink);}
+.pw-dots{display:flex;gap:14px;justify-content:center;}
+.pw-dot{width:16px;height:16px;border-radius:50%;border:2.5px solid var(--purple-light);transition:all .2s;}
+.pw-dot.filled{background:var(--purple);border-color:var(--purple);}
+.btn-login{
+  width:100%;max-width:280px;padding:15px;border-radius:16px;border:none;
+  background:var(--grad);color:#fff;font-size:16px;font-weight:900;
+  cursor:pointer;font-family:inherit;box-shadow:0 6px 20px rgba(155,93,229,.35);
+}
+.btn-login:active{transform:scale(.97);}
+.err{color:var(--pink);font-size:13px;font-weight:700;min-height:20px;text-align:center;}
+.panel-header{
+  background:var(--grad);padding:20px 16px 16px;
+  display:flex;align-items:center;gap:10px;
+}
+.panel-header-title{font-size:18px;font-weight:900;color:#fff;}
+.logout-btn{
+  margin-left:auto;background:rgba(255,255,255,.3);
+  border:2px solid rgba(255,255,255,.5);border-radius:50px;
+  padding:6px 14px;color:#fff;font-size:12px;font-weight:800;
+  cursor:pointer;font-family:inherit;
+}
+.p-section{margin:12px 14px 0;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 2px 12px rgba(155,93,229,.08);border:2px solid #F3E8FF;}
+.p-sec-title{padding:13px 16px;font-size:14px;font-weight:900;color:var(--text);background:#FAFAFF;border-bottom:2px solid #F3E8FF;display:flex;align-items:center;gap:6px;}
+.p-item{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1.5px solid #F9F0FF;}
+.p-item:last-child{border-bottom:none;}
+.p-item-icon{font-size:20px;flex-shrink:0;}
+.p-item-info{flex:1;}
+.p-item-name{font-size:14px;font-weight:700;color:var(--text);}
+.p-item-sub{font-size:11px;color:var(--gray);margin-top:1px;}
+.ibt{width:34px;height:34px;border-radius:10px;border:none;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;transition:all .2s;flex-shrink:0;}
+.ibt:active{transform:scale(.9);}
+.ibt.edit{background:#F3E8FF;color:var(--purple);}
+.ibt.del{background:#FFF0F5;color:var(--pink);}
+.ibt.ok{background:#D1FAE5;color:var(--green);}
+.ibt.rej{background:#FFF0F5;color:var(--pink);}
+.add-form{padding:12px 14px;background:#FAFAFF;border-top:2px solid #F3E8FF;}
+.add-row{display:flex;gap:8px;margin-bottom:8px;}
+.add-row:last-child{margin-bottom:0;}
+.inp{flex:1;padding:10px 12px;border-radius:12px;border:2px solid #E9D5FF;font-size:13px;font-family:inherit;outline:none;min-width:0;}
+.inp:focus{border-color:var(--purple);}
+.inp.sm{max-width:70px;}
+.inp.md{max-width:90px;}
+.sel{flex:1;padding:10px 12px;border-radius:12px;border:2px solid #E9D5FF;font-size:13px;font-family:inherit;outline:none;background:#fff;cursor:pointer;}
+.add-btn{padding:10px 16px;border-radius:12px;border:none;background:var(--grad);color:#fff;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .2s;}
+.add-btn:active{transform:scale(.95);}
+.log-item{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1.5px solid #F9F0FF;}
+.log-item:last-child{border-bottom:none;}
+.log-info{flex:1;}
+.log-who{font-size:13px;font-weight:700;color:var(--text);}
+.log-reason{font-size:11px;color:var(--gray);}
+.log-date{font-size:10px;color:#ccc;}
+.log-pts{font-size:13px;font-weight:800;padding:3px 8px;border-radius:50px;color:#fff;white-space:nowrap;}
+.log-pts.pos{background:var(--green);}
+.log-pts.neg{background:var(--pink);}
+.overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;}
+.overlay.open{display:flex;}
+.modal{background:#fff;border-radius:24px;padding:26px;width:100%;max-width:360px;animation:popIn .3s cubic-bezier(.34,1.56,.64,1);}
+@keyframes popIn{from{transform:scale(.85);opacity:0;}to{transform:scale(1);opacity:1;}}
+.modal h3{font-size:18px;font-weight:900;color:var(--text);margin-bottom:16px;text-align:center;}
+.modal-inp{width:100%;padding:12px 14px;border-radius:14px;border:2.5px solid #E9D5FF;font-size:15px;font-family:inherit;outline:none;margin-bottom:10px;}
+.modal-inp:focus{border-color:var(--purple);}
+.m-btn{width:100%;padding:13px;border-radius:14px;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;margin-bottom:8px;transition:all .2s;}
+.m-btn:active{transform:scale(.97);}
+.m-btn.primary{background:var(--grad);color:#fff;box-shadow:0 6px 20px rgba(155,93,229,.3);}
+.m-btn.secondary{background:#F3F4F6;color:var(--gray);border:2px solid #E9D5FF;}
+.m-btn.danger{background:var(--pink);color:#fff;}
+.sheet-overlay{display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.35);backdrop-filter:blur(4px);align-items:flex-end;justify-content:center;}
+.sheet-overlay.open{display:flex;}
+.sheet{background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:20px;max-height:70vh;overflow-y:auto;animation:slideUp .3s cubic-bezier(.34,1.56,.64,1);}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.sheet-title{font-size:17px;font-weight:900;color:var(--text);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+.sheet-close{background:#F3E8FF;border:none;font-size:16px;cursor:pointer;color:var(--gray);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.sheet-task{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;margin-bottom:6px;border:2px solid #F3E8FF;background:#FAFAFF;}
+.sheet-task.done{background:#F0FDF4;border-color:#BBF7D0;}
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-70px);background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;padding:11px 24px;border-radius:50px;font-size:14px;font-weight:800;box-shadow:0 8px 30px rgba(155,93,229,.4);z-index:999;transition:transform .35s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.empty{text-align:center;padding:24px;color:var(--gray);font-size:14px;}
+.empty-e{font-size:36px;display:block;margin-bottom:8px;}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- ── HOME PAGE ── -->
+<div class="page active" id="pg-home">
+  <div style="background:var(--grad);padding:18px 16px 14px;display:flex;align-items:center;justify-content:space-between;">
+    <div>
+      <div style="font-size:19px;font-weight:900;color:#fff;">✨ 自律生活公約</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.8);margin-top:2px;">每天進步一點點！</div>
+    </div>
+    <div style="font-size:11px;color:rgba(255,255,255,.8);" id="today-label"></div>
+  </div>
+  <div class="cards-row">
+    <div class="kid-card hong-card" onclick="switchKidTab('hong')">
+      <div class="blob"></div>
+      <div class="kid-avatar">🦁</div>
+      <div class="kid-name">泓愷</div>
+      <div class="kid-pts" id="pts-hong">0</div>
+      <div class="pts-label">⭐ 累積點數</div>
+    </div>
+    <div class="kid-card yu-card" onclick="switchKidTab('yu')">
+      <div class="blob"></div>
+      <div class="kid-avatar">🐯</div>
+      <div class="kid-name">昱廷</div>
+      <div class="kid-pts" id="pts-yu">0</div>
+      <div class="pts-label">⭐ 累積點數</div>
+    </div>
+  </div>
+  <div class="week-wrap">
+    <div class="week-row" id="week-bar"></div>
+  </div>
+  <div class="kid-tabs">
+    <button class="kid-tab ht active" id="tab-hong" onclick="switchKidTab('hong')">🦁 泓愷</button>
+    <button class="kid-tab yt" id="tab-yu" onclick="switchKidTab('yu')">🐯 昱廷</button>
+  </div>
+  <div class="task-header section-pad">
+    <span style="font-size:22px">📋</span>
+    <span class="task-header-text">今日任務</span>
+    <span class="task-count" id="task-count">0/0</span>
+  </div>
+  <div class="task-hint section-pad">⚡ 完成任務得點數！</div>
+  <div class="tasks-list" id="home-tasks"></div>
+  <div style="height:10px"></div>
+</div>
+
+<!-- ── REDEEM PAGE ── -->
+<div class="page" id="pg-redeem">
+  <div class="page-title-bar">🎁 兌換中心</div>
+  <div class="kid-select-row">
+    <button class="ks-btn h active" id="rs-hong" onclick="switchRedeemKid('hong')">🦁 泓愷</button>
+    <button class="ks-btn y" id="rs-yu" onclick="switchRedeemKid('yu')">🐯 昱廷</button>
+  </div>
+  <div class="sec-label">🛒 可兌換獎勵</div>
+  <div class="redeem-grid" id="redeem-available"></div>
+  <div class="sec-label">🎫 我的獎勵券</div>
+  <div class="tickets-wrap" id="redeem-tickets"></div>
+  <div style="height:10px"></div>
+</div>
+
+<!-- ── PARENT PAGE ── -->
+<div class="page" id="pg-parent">
+  <div class="parent-locked" id="parent-locked">
+    <div style="font-size:60px">🔐</div>
+    <div style="font-size:22px;font-weight:900;color:var(--text);">家長專區</div>
+    <div style="font-size:14px;color:var(--gray);text-align:center;">請輸入3位密碼進入管理介面</div>
+    <div class="pw-dots">
+      <div class="pw-dot" id="dot0"></div>
+      <div class="pw-dot" id="dot1"></div>
+      <div class="pw-dot" id="dot2"></div>
+    </div>
+    <div class="err" id="pw-err"></div>
+    <div class="numpad">
+      <button class="num-btn" onclick="numPress(1)">1</button>
+      <button class="num-btn" onclick="numPress(2)">2</button>
+      <button class="num-btn" onclick="numPress(3)">3</button>
+      <button class="num-btn" onclick="numPress(4)">4</button>
+      <button class="num-btn" onclick="numPress(5)">5</button>
+      <button class="num-btn" onclick="numPress(6)">6</button>
+      <button class="num-btn" onclick="numPress(7)">7</button>
+      <button class="num-btn" onclick="numPress(8)">8</button>
+      <button class="num-btn" onclick="numPress(9)">9</button>
+      <button class="num-btn" style="grid-column:2" onclick="numPress(0)">0</button>
+      <button class="num-btn del" style="grid-column:3" onclick="numDel()">⌫</button>
+    </div>
+    <button class="btn-login" onclick="doLogin()">🔓 登入</button>
+  </div>
+  <div id="parent-panel" style="display:none;padding-bottom:20px;">
+    <div class="panel-header">
+      <div class="panel-header-title">👑 家長管理介面</div>
+      <button class="logout-btn" onclick="doLogout()">登出</button>
+    </div>
+    <div class="p-section">
+      <div class="p-sec-title">⏳ 待確認兌換申請</div>
+      <div id="p-pending"></div>
+    </div>
+    <div class="p-section">
+      <div class="p-sec-title">💰 點數調整（獎懲）</div>
+      <div class="add-form">
+        <div class="add-row">
+          <select class="sel" id="adj-kid"><option value="hong">🦁 泓愷</option><option value="yu">🐯 昱廷</option></select>
+          <input class="inp md" type="number" id="adj-pts" placeholder="點數（負=扣）">
+        </div>
+        <div class="add-row">
+          <input class="inp" type="text" id="adj-reason" placeholder="原因說明">
+          <button class="add-btn" onclick="adjustPts()">確認</button>
+        </div>
+      </div>
+    </div>
+    <div class="p-section">
+      <div class="p-sec-title">📋 任務管理</div>
+      <div id="p-tasks"></div>
+      <div class="add-form">
+        <div class="add-row">
+          <input class="inp" type="text" id="nt-name" placeholder="任務名稱">
+          <input class="inp sm" type="number" id="nt-pts" placeholder="點數">
+        </div>
+        <div class="add-row">
+          <input class="inp sm" type="text" id="nt-icon" placeholder="圖示">
+          <button class="add-btn" onclick="addTask()">新增 ✨</button>
+        </div>
+      </div>
+    </div>
+    <div class="p-section">
+      <div class="p-sec-title">🎁 獎勵管理</div>
+      <div id="p-rewards"></div>
+      <div class="add-form">
+        <div class="add-row">
+          <input class="inp" type="text" id="nr-name" placeholder="獎勵名稱">
+          <input class="inp md" type="number" id="nr-cost" placeholder="所需點數">
+        </div>
+        <div class="add-row">
+          <input class="inp sm" type="text" id="nr-icon" placeholder="圖示">
+          <button class="add-btn" onclick="addReward()">新增 🎁</button>
+        </div>
+      </div>
+    </div>
+    <div class="p-section">
+      <div class="p-sec-title">📜 點數紀錄</div>
+      <div id="p-log"></div>
+    </div>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- ── NAV ── -->
+<nav class="nav">
+  <button class="nav-btn active" id="nav-home" onclick="showPage('home')">
+    <span class="n-icon">🏠</span><span class="n-label">首頁</span>
+  </button>
+  <button class="nav-btn" id="nav-redeem" onclick="showPage('redeem')">
+    <span class="n-icon">🎁</span><span class="n-label">兌換</span>
+  </button>
+  <button class="nav-btn" id="nav-parent" onclick="showPage('parent')">
+    <span class="n-icon">🔑</span><span class="n-label">家長</span>
+  </button>
+</nav>
+
+<!-- EDIT MODAL -->
+<div class="overlay" id="edit-modal">
+  <div class="modal">
+    <h3 id="edit-title">✏️ 編輯</h3>
+    <input class="modal-inp" id="edit-name" placeholder="名稱">
+    <input class="modal-inp" id="edit-num" type="number" placeholder="點數">
+    <input class="modal-inp" id="edit-icon" placeholder="圖示 emoji">
+    <input type="hidden" id="edit-type">
+    <input type="hidden" id="edit-id">
+    <button class="m-btn primary" onclick="saveEdit()">💾 儲存</button>
+    <button class="m-btn secondary" onclick="closeOverlay('edit-modal')">取消</button>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="overlay" id="confirm-modal">
+  <div class="modal">
+    <h3>🗑️ 確定刪除？</h3>
+    <p style="color:var(--gray);font-size:14px;text-align:center;margin-bottom:20px;" id="confirm-msg">這個動作無法復原</p>
+    <button class="m-btn danger" onclick="doDelete()">確定刪除</button>
+    <button class="m-btn secondary" onclick="closeOverlay('confirm-modal')">取消</button>
+  </div>
+</div>
+
+<!-- REDEEM MODAL -->
+<div class="overlay" id="redeem-modal">
+  <div class="modal" style="text-align:center;">
+    <div style="font-size:52px;margin-bottom:8px" id="rm-icon">🎁</div>
+    <h3 id="rm-name">獎勵</h3>
+    <p style="color:var(--gray);font-size:14px;margin-bottom:6px;">需要 <strong id="rm-cost" style="color:var(--purple)">0</strong> 點</p>
+    <p style="color:var(--gray);font-size:14px;margin-bottom:20px;">你現在有 <strong id="rm-cur" style="color:var(--pink)">0</strong> 點</p>
+    <button class="m-btn primary" id="rm-ok" onclick="confirmRedeem()">🎉 確認兌換！</button>
+    <button class="m-btn secondary" onclick="closeOverlay('redeem-modal')">再想想</button>
+  </div>
+</div>
+
+<!-- DAY SHEET -->
+<div class="sheet-overlay" id="day-sheet">
+  <div class="sheet">
+    <div class="sheet-title">
+      <span id="sheet-title-txt">紀錄</span>
+      <button class="sheet-close" onclick="closeSheet()">✕</button>
+    </div>
+    <div id="sheet-content"></div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──
+const PASS='333';
+const DAYS=['日','一','二','三','四','五','六'];
+
+let S=JSON.parse(localStorage.getItem('kapp3'))||{
+  kids:{hong:{name:'泓愷',pts:0},yu:{name:'昱廷',pts:0}},
+  tasks:[
+    {id:1,name:'整理書桌',pts:2,icon:'📚'},
+    {id:2,name:'自己起床不賴床',pts:3,icon:'⏰'},
+    {id:3,name:'飯後刷牙',pts:2,icon:'🦷'},
+    {id:4,name:'完成作業',pts:5,icon:'✏️'},
+    {id:5,name:'收拾玩具',pts:2,icon:'🧸'},
+  ],
+  rewards:[
+    {id:1,name:'看30分鐘YouTube',cost:20,icon:'📺'},
+    {id:2,name:'去吃麥當勞',cost:40,icon:'🍔'},
+    {id:3,name:'買一個小玩具',cost:50,icon:'🎮'},
+    {id:4,name:'週末睡到自然醒',cost:30,icon:'😴'},
+  ],
+  records:{},
+  redemptions:[],
+  log:[],
+  nextTid:6,nextRid:5,nextDid:1,
+};
+function save(){localStorage.setItem('kapp3',JSON.stringify(S));}
+function todayKey(){return new Date().toISOString().slice(0,10);}
+function getWeek(){
+  const now=new Date(),dow=now.getDay();
+  const mon=new Date(now);mon.setDate(now.getDate()-((dow+6)%7));
+  return Array.from({length:7},(_,i)=>{const d=new Date(mon);d.setDate(mon.getDate()+i);return{date:d.toISOString().slice(0,10),day:d.getDay()};});
+}
+
+// ── UI STATE ──
+let curKid='hong',curRKid='hong',loggedIn=false,pwBuf='';
+let delPending={type:null,id:null},redeemPending={kid:null,reward:null};
+
+// ── TOAST ──
+let toastT=null;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+// ── PAGES ──
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pg-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  if(name==='home')renderHome();
+  if(name==='redeem')renderRedeem();
+  if(name==='parent')renderParent();
+}
+
+// ── HOME ──
+function renderHome(){
+  const d=new Date();
+  document.getElementById('today-label').textContent=`${d.getMonth()+1}月${d.getDate()}日 ${DAYS[d.getDay()]}`;
+  document.getElementById('pts-hong').textContent=S.kids.hong.pts;
+  document.getElementById('pts-yu').textContent=S.kids.yu.pts;
+  renderWeekBar();
+  renderHomeTasks();
+}
+function renderWeekBar(){
+  const bar=document.getElementById('week-bar');
+  const week=getWeek();const td=todayKey();
+  const rec=S.records[curKid]||{};
+  bar.innerHTML='';
+  week.forEach(({date,day})=>{
+    const dayRec=rec[date]||{};
+    const hasDone=Object.values(dayRec).some(Boolean);
+    const isToday=date===td;
+    const div=document.createElement('div');
+    div.className='day-cell'+(hasDone?' done':'')+(isToday?' today':'');
+    div.innerHTML=`<div class="d-circle">${hasDone?'✓':DAYS[day]}</div><div class="d-label">${isToday?'今天':DAYS[day]}</div>`;
+    div.addEventListener('click',()=>openSheet(curKid,date,DAYS[day]));
+    bar.appendChild(div);
+  });
+}
+function switchKidTab(kid){
+  curKid=kid;
+  document.getElementById('tab-hong').className='kid-tab ht'+(kid==='hong'?' active':'');
+  document.getElementById('tab-yu').className='kid-tab yt'+(kid==='yu'?' active':'');
+  renderWeekBar();renderHomeTasks();
+}
+function renderHomeTasks(){
+  const td=todayKey();
+  const rec=(S.records[curKid]||{})[td]||{};
+  const doneN=S.tasks.filter(t=>rec[t.id]).length;
+  document.getElementById('task-count').textContent=`${doneN}/${S.tasks.length}`;
+  const c=document.getElementById('home-tasks');
+  if(!S.tasks.length){c.innerHTML='<div class="empty"><span class="empty-e">📝</span>家長尚未新增任務</div>';return;}
+  c.innerHTML=S.tasks.map(t=>{
+    const done=!!rec[t.id];
+    return `<div class="task-row ${curKid==='hong'?'ht':'yt'}${done?' done':''}" data-kid="${curKid}" data-tid="${t.id}">
+      <div class="check-btn">${done?'✓':''}</div>
+      <div class="task-name">${t.icon} ${t.name}</div>
+      <div class="pts-chip">+${t.pts} ⭐</div>
+    </div>`;
+  }).join('');
+  // Attach events
+  document.querySelectorAll('.task-row[data-tid]').forEach(row=>{
+    row.addEventListener('click',()=>toggleTask(row.dataset.kid,parseInt(row.dataset.tid)));
+  });
+}
+function toggleTask(kid,tid){
+  const td=todayKey();
+  if(!S.records[kid])S.records[kid]={};
+  if(!S.records[kid][td])S.records[kid][td]={};
+  const rec=S.records[kid][td];
+  const task=S.tasks.find(t=>t.id===tid);if(!task)return;
+  if(rec[tid]){
+    rec[tid]=false;
+    S.kids[kid].pts=Math.max(0,S.kids[kid].pts-task.pts);
+    S.log.unshift({kid,pts:-task.pts,reason:`取消：${task.name}`,date:td});
+    toast(`🔄 取消「${task.name}」`);
+  }else{
+    rec[tid]=true;
+    S.kids[kid].pts+=task.pts;
+    S.log.unshift({kid,pts:task.pts,reason:`完成：${task.name}`,date:td});
+    toast(`⭐ ${S.kids[kid].name} 完成「${task.name}」+${task.pts}點！`);
+  }
+  save();renderHome();
+}
+
+// ── DAY SHEET ──
+function openSheet(kid,date,dayName){
+  document.getElementById('sheet-title-txt').textContent=`${dayName} ${date} 紀錄 - ${S.kids[kid].name}`;
+  const rec=(S.records[kid]||{})[date]||{};
+  let html=S.tasks.map(t=>{
+    const done=!!rec[t.id];
+    return `<div class="sheet-task${done?' done':''}">
+      <span style="font-size:20px">${t.icon}</span>
+      <span style="flex:1;font-size:14px;font-weight:700;color:${done?'#10B981':'#2D1B69'}">${t.name}</span>
+      <span style="font-size:12px;font-weight:700;color:${done?'#10B981':'#aaa'}">+${t.pts}點</span>
+      <span style="font-size:18px">${done?'✅':'⬜'}</span>
+    </div>`;
+  }).join('');
+  if(!html)html='<div class="empty">當天沒有任務</div>';
+  document.getElementById('sheet-content').innerHTML=html;
+  document.getElementById('day-sheet').classList.add('open');
+}
+function closeSheet(){document.getElementById('day-sheet').classList.remove('open');}
+document.getElementById('day-sheet').addEventListener('click',function(e){if(e.target===this)closeSheet();});
+
+// ── REDEEM ──
+function switchRedeemKid(kid){
+  curRKid=kid;
+  document.getElementById('rs-hong').className='ks-btn h'+(kid==='hong'?' active':'');
+  document.getElementById('rs-yu').className='ks-btn y'+(kid==='yu'?' active':'');
+  renderRedeem();
+}
+function renderRedeem(){
+  const kid=curRKid,pts=S.kids[kid].pts;
+  const av=document.getElementById('redeem-available');
+  if(!S.rewards.length){av.innerHTML='<div class="empty"><span class="empty-e">🎪</span>家長尚未新增獎勵</div>';}
+  else av.innerHTML=S.rewards.map(r=>{
+    const can=pts>=r.cost;
+    return `<div class="reward-card">
+      <div class="r-icon">${r.icon}</div>
+      <div class="r-info">
+        <div class="r-name">${r.name}</div>
+        <div class="r-cost">⭐ 需要 ${r.cost} 點 ／ 現有 <strong style="color:var(--${can?'green':'pink'})">${pts}</strong> 點</div>
+      </div>
+      <button class="r-btn ${can?'can':'cant'}" ${can?`data-kid="${kid}" data-rid="${r.id}"`:''}>
+        ${can?'兌換':'點數不足'}
+      </button>
+    </div>`;
+  }).join('');
+  // Bind redeem btns
+  document.querySelectorAll('.r-btn.can[data-rid]').forEach(btn=>{
+    btn.addEventListener('click',()=>openRedeemModal(btn.dataset.kid,parseInt(btn.dataset.rid)));
+  });
+
+  const tw=document.getElementById('redeem-tickets');
+  const pending=S.redemptions.filter(r=>r.kid===kid&&r.status==='pending');
+  const confirmed=S.redemptions.filter(r=>r.kid===kid&&r.status==='confirmed');
+  let th='';
+  if(!pending.length&&!confirmed.length)th='<div class="empty"><span class="empty-e">🎫</span>尚無兌換紀錄</div>';
+  else{
+    pending.forEach(r=>{th+=`<div class="ticket"><div class="t-icon">${r.icon}</div><div class="t-info"><div class="t-name">${r.rewardName}</div><div class="t-meta">扣 ${r.cost} 點・等待家長確認</div></div><span class="t-tag pending">⏳ 待確認</span></div>`;});
+    if(confirmed.length){
+      th+=`<div style="font-size:12px;font-weight:700;color:var(--gray);padding:8px 0 4px;">已使用獎勵</div>`;
+      confirmed.forEach(r=>{th+=`<div class="ticket used"><div class="t-icon">${r.icon}</div><div class="t-info"><div class="t-name">${r.rewardName}</div><div class="t-meta">已使用・${r.date}</div></div><span class="t-tag confirmed">✓ 完成</span></div>`;});
+    }
+  }
+  tw.innerHTML=th;
+}
+function openRedeemModal(kid,rid){
+  const r=S.rewards.find(x=>x.id===rid);if(!r)return;
+  redeemPending={kid,reward:r};
+  document.getElementById('rm-icon').textContent=r.icon;
+  document.getElementById('rm-name').textContent=r.name;
+  document.getElementById('rm-cost').textContent=r.cost;
+  document.getElementById('rm-cur').textContent=S.kids[kid].pts;
+  document.getElementById('redeem-modal').classList.add('open');
+}
+function confirmRedeem(){
+  const {kid,reward}=redeemPending;
+  if(S.kids[kid].pts<reward.cost){toast('❌ 點數不足！');return;}
+  S.kids[kid].pts-=reward.cost;
+  S.redemptions.push({id:S.nextDid++,kid,rewardId:reward.id,rewardName:reward.name,icon:reward.icon,cost:reward.cost,status:'pending',date:todayKey()});
+  S.log.unshift({kid,pts:-reward.cost,reason:`兌換：${reward.name}`,date:todayKey()});
+  save();closeOverlay('redeem-modal');renderRedeem();renderHome();
+  toast(`🎉 已申請「${reward.name}」！等待家長確認`);
+}
+
+// ── PARENT ──
+function renderParent(){
+  if(loggedIn){
+    document.getElementById('parent-locked').style.display='none';
+    document.getElementById('parent-panel').style.display='block';
+    renderAdminAll();
+  }else{
+    document.getElementById('parent-locked').style.display='flex';
+    document.getElementById('parent-panel').style.display='none';
+    pwBuf='';updateDots();
+    document.getElementById('pw-err').textContent='';
+  }
+}
+function updateDots(){for(let i=0;i<3;i++)document.getElementById('dot'+i).className='pw-dot'+(i<pwBuf.length?' filled':'');}
+function numPress(n){if(pwBuf.length>=3)return;pwBuf+=n;updateDots();if(pwBuf.length===3)setTimeout(doLogin,120);}
+function numDel(){if(pwBuf.length>0){pwBuf=pwBuf.slice(0,-1);updateDots();document.getElementById('pw-err').textContent='';}}
+function doLogin(){
+  if(pwBuf===PASS){loggedIn=true;document.getElementById('pw-err').textContent='';renderParent();}
+  else{document.getElementById('pw-err').textContent='❌ 密碼錯誤，請再試一次！';pwBuf='';updateDots();}
+}
+function doLogout(){loggedIn=false;renderParent();}
+
+function renderAdminAll(){renderPending();renderPTasks();renderPRewards();renderPLog();}
+function renderPending(){
+  const el=document.getElementById('p-pending');
+  const list=S.redemptions.filter(r=>r.status==='pending');
+  if(!list.length){el.innerHTML='<div class="empty">目前沒有待確認申請</div>';return;}
+  el.innerHTML=list.map(r=>`<div class="p-item">
+    <div class="p-item-icon">${r.icon}</div>
+    <div class="p-item-info"><div class="p-item-name">${S.kids[r.kid].name}・${r.rewardName}</div><div class="p-item-sub">扣 ${r.cost} 點・${r.date}</div></div>
+    <button class="ibt ok" data-apid="${r.id}">✓</button>
+    <button class="ibt rej" data-rejid="${r.id}">✕</button>
+  </div>`).join('');
+  document.querySelectorAll('.ibt.ok[data-apid]').forEach(b=>b.addEventListener('click',()=>approveRedeem(parseInt(b.dataset.apid))));
+  document.querySelectorAll('.ibt.rej[data-rejid]').forEach(b=>b.addEventListener('click',()=>rejectRedeem(parseInt(b.dataset.rejid))));
+}
+function approveRedeem(id){
+  const r=S.redemptions.find(x=>x.id===id);if(!r)return;
+  r.status='confirmed';save();renderAdminAll();renderRedeem();
+  toast(`✅ 已確認「${r.rewardName}」`);
+}
+function rejectRedeem(id){
+  const r=S.redemptions.find(x=>x.id===id);if(!r)return;
+  S.kids[r.kid].pts+=r.cost;
+  S.log.unshift({kid:r.kid,pts:r.cost,reason:`退還：拒絕兌換「${r.rewardName}」`,date:todayKey()});
+  S.redemptions=S.redemptions.filter(x=>x.id!==id);
+  save();renderAdminAll();renderRedeem();renderHome();
+  toast(`↩️ 已退還 ${r.cost} 點`);
+}
+function renderPTasks(){
+  const el=document.getElementById('p-tasks');
+  if(!S.tasks.length){el.innerHTML='<div class="empty">尚無任務</div>';return;}
+  el.innerHTML=S.tasks.map(t=>`<div class="p-item">
+    <div class="p-item-icon">${t.icon}</div>
+    <div class="p-item-info"><div class="p-item-name">${t.name}</div><div class="p-item-sub">完成得 ${t.pts} 點</div></div>
+    <button class="ibt edit" data-etype="task" data-eid="${t.id}">✏️</button>
+    <button class="ibt del" data-dtype="task" data-did="${t.id}" data-dname="${t.name}">🗑️</button>
+  </div>`).join('');
+  document.querySelectorAll('.ibt.edit[data-etype]').forEach(b=>b.addEventListener('click',()=>openEdit(b.dataset.etype,parseInt(b.dataset.eid))));
+  document.querySelectorAll('.ibt.del[data-dtype]').forEach(b=>b.addEventListener('click',()=>openConfirm(b.dataset.dtype,parseInt(b.dataset.did),`確定刪除任務「${b.dataset.dname}」？`)));
+}
+function addTask(){
+  const name=document.getElementById('nt-name').value.trim();
+  const pts=parseInt(document.getElementById('nt-pts').value)||5;
+  const icon=document.getElementById('nt-icon').value.trim()||'⭐';
+  if(!name){toast('請輸入任務名稱');return;}
+  S.tasks.push({id:S.nextTid++,name,pts,icon});
+  document.getElementById('nt-name').value='';
+  document.getElementById('nt-pts').value='';
+  document.getElementById('nt-icon').value='';
+  save();renderPTasks();renderHomeTasks();
+  toast(`✅ 新增任務「${name}」`);
+}
+function renderPRewards(){
+  const el=document.getElementById('p-rewards');
+  if(!S.rewards.length){el.innerHTML='<div class="empty">尚無獎勵</div>';return;}
+  el.innerHTML=S.rewards.map(r=>`<div class="p-item">
+    <div class="p-item-icon">${r.icon}</div>
+    <div class="p-item-info"><div class="p-item-name">${r.name}</div><div class="p-item-sub">需要 ${r.cost} 點</div></div>
+    <button class="ibt edit" data-etype="reward" data-eid="${r.id}">✏️</button>
+    <button class="ibt del" data-dtype="reward" data-did="${r.id}" data-dname="${r.name}">🗑️</button>
+  </div>`).join('');
+  document.querySelectorAll('.ibt.edit[data-etype]').forEach(b=>b.addEventListener('click',()=>openEdit(b.dataset.etype,parseInt(b.dataset.eid))));
+  document.querySelectorAll('.ibt.del[data-dtype]').forEach(b=>b.addEventListener('click',()=>openConfirm(b.dataset.dtype,parseInt(b.dataset.did),`確定刪除獎勵「${b.dataset.dname}」？`)));
+}
+function addReward(){
+  const name=document.getElementById('nr-name').value.trim();
+  const cost=parseInt(document.getElementById('nr-cost').value)||20;
+  const icon=document.getElementById('nr-icon').value.trim()||'🎁';
+  if(!name){toast('請輸入獎勵名稱');return;}
+  S.rewards.push({id:S.nextRid++,name,cost,icon});
+  document.getElementById('nr-name').value='';
+  document.getElementById('nr-cost').value='';
+  document.getElementById('nr-icon').value='';
+  save();renderPRewards();
+  toast(`🎁 新增獎勵「${name}」`);
+}
+function renderPLog(){
+  const el=document.getElementById('p-log');
+  if(!S.log.length){el.innerHTML='<div class="empty">尚無紀錄</div>';return;}
+  el.innerHTML=S.log.slice(0,40).map(l=>`<div class="log-item">
+    <div class="log-info"><div class="log-who">${S.kids[l.kid]?.name||l.kid}</div><div class="log-reason">${l.reason}</div><div class="log-date">${l.date}</div></div>
+    <span class="log-pts ${l.pts>0?'pos':'neg'}">${l.pts>0?'+':''}${l.pts}</span>
+  </div>`).join('');
+}
+function adjustPts(){
+  const kid=document.getElementById('adj-kid').value;
+  const pts=parseInt(document.getElementById('adj-pts').value);
+  const reason=document.getElementById('adj-reason').value.trim()||'手動調整';
+  if(isNaN(pts)||pts===0){toast('請輸入有效點數');return;}
+  S.kids[kid].pts=Math.max(0,S.kids[kid].pts+pts);
+  S.log.unshift({kid,pts,reason,date:todayKey()});
+  document.getElementById('adj-pts').value='';
+  document.getElementById('adj-reason').value='';
+  save();renderPLog();renderHome();
+  toast(`${pts>0?'⭐ 加':'😞 扣'} ${Math.abs(pts)} 點 → ${S.kids[kid].name}`);
+}
+
+// ── EDIT ──
+function openEdit(type,id){
+  const item=type==='task'?S.tasks.find(t=>t.id===id):S.rewards.find(r=>r.id===id);
+  if(!item)return;
+  document.getElementById('edit-title').textContent=type==='task'?'✏️ 編輯任務':'✏️ 編輯獎勵';
+  document.getElementById('edit-name').value=item.name;
+  document.getElementById('edit-num').value=type==='task'?item.pts:item.cost;
+  document.getElementById('edit-icon').value=item.icon;
+  document.getElementById('edit-type').value=type;
+  document.getElementById('edit-id').value=id;
+  document.getElementById('edit-modal').classList.add('open');
+}
+function saveEdit(){
+  const type=document.getElementById('edit-type').value;
+  const id=parseInt(document.getElementById('edit-id').value);
+  const name=document.getElementById('edit-name').value.trim();
+  const num=parseInt(document.getElementById('edit-num').value)||0;
+  const icon=document.getElementById('edit-icon').value.trim()||'⭐';
+  if(!name){toast('名稱不能空白');return;}
+  if(type==='task'){const t=S.tasks.find(x=>x.id===id);if(t){t.name=name;t.pts=num;t.icon=icon;}renderPTasks();renderHomeTasks();}
+  else{const r=S.rewards.find(x=>x.id===id);if(r){r.name=name;r.cost=num;r.icon=icon;}renderPRewards();}
+  save();closeOverlay('edit-modal');toast('💾 已儲存！');
+}
+
+// ── DELETE ──
+function openConfirm(type,id,msg){
+  delPending={type,id};
+  document.getElementById('confirm-msg').textContent=msg;
+  document.getElementById('confirm-modal').classList.add('open');
+}
+function doDelete(){
+  const{type,id}=delPending;
+  if(type==='task'){S.tasks=S.tasks.filter(t=>t.id!==id);renderPTasks();renderHomeTasks();}
+  else{S.rewards=S.rewards.filter(r=>r.id!==id);renderPRewards();}
+  save();closeOverlay('confirm-modal');toast('🗑️ 已刪除');
+}
+
+// ── MODALS ──
+function closeOverlay(id){document.getElementById(id).classList.remove('open');}
+// Close on backdrop click for each overlay
+['edit-modal','confirm-modal','redeem-modal'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',function(e){if(e.target===this)closeOverlay(id);});
+});
+
+// ── INIT ──
+renderHome();
+</script>
+</body>
+</html>
